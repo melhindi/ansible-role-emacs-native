@@ -1,0 +1,7 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: "Include melhindi.emacs_native_compilation"
+      include_role:
+        name: "melhindi.emacs_native_compilation"

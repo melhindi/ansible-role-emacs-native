@@ -1,0 +1,16 @@
+galaxy_info:
+  role_name: emacs_native_compilation
+  author: melhindi
+  description: Build and install GNU Emacs with native-compilation enabled
+  license: Apache-2.0
+  min_ansible_version: 2.1
+  platforms:
+    - name: Ubuntu
+      versions:
+      - focal
+
+  galaxy_tags:
+    - emacs
+    - nativecompilation
+
+dependencies: []

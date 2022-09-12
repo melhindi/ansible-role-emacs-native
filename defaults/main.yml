@@ -1,0 +1,5 @@
+---
+# defaults file for emacs_native_compilation
+
+emacs_repo_url: "git://git.savannah.gnu.org/emacs.git"
+emacs_checkout_path: "/tmp/emacs"

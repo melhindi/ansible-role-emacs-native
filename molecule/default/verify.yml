@@ -1,0 +1,15 @@
+---
+# This is an example playbook to execute Ansible tests.
+
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Load variables
+      include_vars:
+        file: ../../defaults/main.yml
+
+    - name: Retrieve emacs version
+      ansible.builtin.command:
+        cmd: "emacs --version"
+      register: emacs_output

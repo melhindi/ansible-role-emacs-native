@@ -1,0 +1,86 @@
+---
+# tasks file for emacs_native_compilation
+
+- name: Include variables
+  ansible.builtin.include_vars:
+    file: main.yml
+
+- name: Ensure git is installed
+  ansible.builtin.apt:
+    name: git
+    state: present
+    update_cache: true
+  become: true
+
+- name: Ensure build-essential is installed
+  ansible.builtin.apt:
+    name: build-essential
+    state: present
+    update_cache: true
+  become: true
+
+- name: Ensure dirmngr is installed for adding apt repo in next step
+  ansible.builtin.apt:
+    name: dirmngr
+    state: present
+    update_cache: true
+  become: true
+
+# Install libgccjit dependency
+- name: Add APT repository for libgccjit
+  ansible.builtin.apt_repository:
+    repo: "ppa:ubuntu-toolchain-r/ppa"
+    state: present
+    update_cache: true
+  become: true
+
+- name: Install emacs dependencies
+  ansible.builtin.apt:
+    name:
+      - "gcc-{{ gcc_version }}"
+      - "libgccjit-{{ gcc_version }}-dev"
+      - libgccjit0
+      - libjansson4
+      - libjansson-dev
+      - autoconf
+      - texinfo
+      - pkg-config
+      - libgnutls28-dev
+      - libtinfo-dev
+      - libgtk-3-dev
+      - libwebkit2gtk-4.0-dev
+    state: present
+    update_cache: true
+  become: true
+
+- name: Clone Emacs repository
+  ansible.builtin.git:
+    repo: "{{ emacs_repo_url }}"
+    dest: "{{ emacs_checkout_path }}"
+    version: "{{ emacs_version }}"
+    depth: 1
+
+- name: Run autogen.sh
+  ansible.builtin.shell:
+    cmd: "CC=gcc-{{ gcc_version }} ./autogen.sh"
+    chdir: "{{ emacs_checkout_path }}"
+    creates: "{{ emacs_checkout_path }}/configure"
+
+- name: Configure build
+  ansible.builtin.shell:
+    cmd: "CC=gcc-{{ gcc_version }} ./configure --with-native-compilation --with-json --with-mailutils --with-cairo --with-xwidgets --with-x-toolkit=gtk3"
+    chdir: "{{ emacs_checkout_path }}"
+    creates: "{{ emacs_checkout_path }}/Makefile"
+
+- name: Compile emacs - this might take long!
+  ansible.builtin.make:
+    jobs: "{{ num_build_jobs }}"
+    chdir: "{{ emacs_checkout_path }}"
+    params:
+      CC: "gcc-{{ gcc_version }}"
+
+- name: Install emacs
+  ansible.builtin.make:
+    target: install
+    chdir: "{{ emacs_checkout_path }}"
+  become: true
