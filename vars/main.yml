@@ -1,5 +1,5 @@
 ---
-# vars file for intel_sgx_sdk
+# vars file for emacs_native_compilation
 
 num_build_jobs: 2
 emacs_version: "emacs-28"
